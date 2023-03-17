@@ -65,8 +65,10 @@ bool XDemux::Open(const char *url)
 	cout << videoStream << "视频信息" << endl;
 	//宽高数据有可能没有 比较可靠的是解码后的AVFamily
 	//宽度
+	width = as->codecpar->width;
 	cout << "width = " << as->codecpar->width << endl;
 	//高度
+	height = as->codecpar->height;
 	cout << "height = " << as->codecpar->height << endl;
 	//帧率 fps AVRational
 	cout << "video fps = " << r2d(as->avg_frame_rate) << endl;
@@ -74,6 +76,9 @@ bool XDemux::Open(const char *url)
 	///获取音频流
 	audioStream = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
 	as = ic->streams[audioStream];
+	sampleRate = as->codecpar->sample_rate;
+	channels = as->codecpar->channels;
+
 	cout << "========================================" << endl;
 	cout << audioStream << "音频信息" << endl;
 	//采样率
@@ -89,6 +94,17 @@ bool XDemux::Open(const char *url)
 	// 1024 * 2 * 2 = 4096  fps = sample_rate/frame_size
 	mux.unlock();
 
+	return true;
+}
+
+//判断是音频还是视频
+bool XDemux::IsAudio(AVPacket *pkt)
+{
+	if (!pkt)
+		return false;
+	//如果是视频流返回false，否则返回true
+	if (pkt->stream_index == videoStream)
+		return false;
 	return true;
 }
 

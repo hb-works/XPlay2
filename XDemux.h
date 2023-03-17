@@ -12,6 +12,9 @@ public:
 	//空间需要调用者释放，释放AVPacket对象空间，和数据空间 av_packet_free
 	virtual AVPacket *Read();
 
+	//判断是音频还是视频
+	virtual bool IsAudio(AVPacket *pkt);
+
 	//获取视频参数 返回的空间需要清理(调用avcodec_parameters_free进行清理)，因为这是复制了一份的
 	virtual AVCodecParameters *CopyVPara();
 
@@ -30,6 +33,11 @@ public:
 
 	//媒体总时长 （毫秒）
 	int totalMs = 0;
+
+	int width = 0;
+	int height = 0;
+	int sampleRate = 0;
+	int channels = 0;
 
 protected:
 	//加一个互斥变量，原则是尽晚加锁，尽早释放

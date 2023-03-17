@@ -15,18 +15,23 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QWidget>
+#include <XVideoWidget.h>
 
 QT_BEGIN_NAMESPACE
 
 class Ui_XPlay2Class
 {
 public:
+    XVideoWidget *openGLWidget;
 
     void setupUi(QWidget *XPlay2Class)
     {
         if (XPlay2Class->objectName().isEmpty())
             XPlay2Class->setObjectName(QStringLiteral("XPlay2Class"));
-        XPlay2Class->resize(600, 400);
+        XPlay2Class->resize(1043, 827);
+        openGLWidget = new XVideoWidget(XPlay2Class);
+        openGLWidget->setObjectName(QStringLiteral("openGLWidget"));
+        openGLWidget->setGeometry(QRect(50, 50, 800, 600));
 
         retranslateUi(XPlay2Class);
 

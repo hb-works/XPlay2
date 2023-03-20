@@ -75,13 +75,26 @@ void XVideoWidget::Repaint(AVFrame *frame)
 		mux.unlock();
 		return;
 	}
-	//拷贝
-	memcpy(datas[0], frame->data[0], width * height);		//Y
-	memcpy(datas[1], frame->data[1], width * height / 4);	//U
-	memcpy(datas[2], frame->data[2], width * height / 4);	//V
+	if (width == frame->linesize[0])	//无需对齐
+	{
+		//拷贝
+		memcpy(datas[0], frame->data[0], width * height);		//Y
+		memcpy(datas[1], frame->data[1], width * height / 4);	//U
+		memcpy(datas[2], frame->data[2], width * height / 4);	//V
+	}
+	else  //行对齐问题
+	{
+		for(int i = 0; i < height; i++)	//Y
+			memcpy(datas[0] + width * i, frame->data[0] + frame->linesize[0] * i, width);
+		for (int i = 0; i < height / 2; i++)	//Y
+			memcpy(datas[1] + width / 2 * i, frame->data[1] + frame->linesize[1] * i, width);
+		for (int i = 0; i < height / 2; i++)	//Y
+			memcpy(datas[2] + width / 2 * i, frame->data[2] + frame->linesize[2] * i, width);
+	}
 
-	//行对齐问题
 	mux.unlock();
+	//拷贝完空间要释放掉
+	av_frame_free(&frame);
 
 	//刷新显示
 	update();

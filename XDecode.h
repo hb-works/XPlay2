@@ -5,11 +5,17 @@ struct AVCodecParameters;
 struct AVCodecContext;
 struct AVFrame;
 struct AVPacket;
+//这两个函数的接口外放出去
+extern void XFreePacket(AVPacket **pkt);
+extern void XFreeFrame(AVFrame **frame);
 class XDecode
 {
 public:
 	//增加一个成员，确定当前的是音频还是视频
 	bool isAudio = false;
+
+	//当前解码到的pts
+	long long pts = 0;
 
 	//打开解码器,不管成功与否都释放para空间
 	virtual bool Open(AVCodecParameters *para);

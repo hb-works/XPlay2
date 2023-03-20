@@ -14,8 +14,10 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 #include <XVideoWidget.h>
+#include "XSlider.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -23,17 +25,35 @@ class Ui_XPlay2Class
 {
 public:
     XVideoWidget *openGLWidget;
+    QPushButton *openFile;
+    XSlider *playPos;
+    QPushButton *isPlay;
 
     void setupUi(QWidget *XPlay2Class)
     {
         if (XPlay2Class->objectName().isEmpty())
             XPlay2Class->setObjectName(QStringLiteral("XPlay2Class"));
-        XPlay2Class->resize(1043, 827);
+        XPlay2Class->resize(1280, 720);
         openGLWidget = new XVideoWidget(XPlay2Class);
         openGLWidget->setObjectName(QStringLiteral("openGLWidget"));
-        openGLWidget->setGeometry(QRect(50, 50, 800, 600));
+        openGLWidget->setGeometry(QRect(0, 0, 1280, 720));
+        openFile = new QPushButton(XPlay2Class);
+        openFile->setObjectName(QStringLiteral("openFile"));
+        openFile->setGeometry(QRect(470, 610, 91, 51));
+        playPos = new XSlider(XPlay2Class);
+        playPos->setObjectName(QStringLiteral("playPos"));
+        playPos->setGeometry(QRect(20, 680, 1251, 22));
+        playPos->setMaximum(999);
+        playPos->setOrientation(Qt::Horizontal);
+        isPlay = new QPushButton(XPlay2Class);
+        isPlay->setObjectName(QStringLiteral("isPlay"));
+        isPlay->setGeometry(QRect(580, 610, 91, 51));
 
         retranslateUi(XPlay2Class);
+        QObject::connect(openFile, SIGNAL(clicked()), XPlay2Class, SLOT(OpenFile()));
+        QObject::connect(isPlay, SIGNAL(clicked()), XPlay2Class, SLOT(PlayOrPause()));
+        QObject::connect(playPos, SIGNAL(sliderPressed()), XPlay2Class, SLOT(SliderPress()));
+        QObject::connect(playPos, SIGNAL(sliderReleased()), XPlay2Class, SLOT(SliderRelease()));
 
         QMetaObject::connectSlotsByName(XPlay2Class);
     } // setupUi
@@ -41,6 +61,8 @@ public:
     void retranslateUi(QWidget *XPlay2Class)
     {
         XPlay2Class->setWindowTitle(QApplication::translate("XPlay2Class", "XPlay2", Q_NULLPTR));
+        openFile->setText(QApplication::translate("XPlay2Class", "\346\211\223\345\274\200\346\226\207\344\273\266", Q_NULLPTR));
+        isPlay->setText(QApplication::translate("XPlay2Class", "\346\222\255\346\224\276", Q_NULLPTR));
     } // retranslateUi
 
 };

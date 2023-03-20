@@ -12,6 +12,9 @@ public:
 	//空间需要调用者释放，释放AVPacket对象空间，和数据空间 av_packet_free
 	virtual AVPacket *Read();
 
+	//只读视频，音频丢弃，空间释放
+	virtual AVPacket *ReadVideo();
+
 	//判断是音频还是视频
 	virtual bool IsAudio(AVPacket *pkt);
 

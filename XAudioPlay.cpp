@@ -9,6 +9,44 @@ public:
 	QAudioOutput *output = NULL;
 	QIODevice *io = NULL;
 	std::mutex mux;
+
+	virtual long long GetNoPlayMs()
+	{
+		mux.lock();
+		if (!output)
+		{
+			mux.unlock();
+			return 0;
+		}
+
+		long long pts = 0;
+		//还未播放的音频的字节数
+		double size = output->bufferSize() - output->bytesFree();
+		//一秒音频的字节大小
+		double secSize = sampleRate * (sampleSize / 8) * channels;
+		if (secSize <= 0)
+		{
+			pts = 0;
+		}
+		else
+		{
+			//未播放的时间(ms)
+			pts = (size / secSize) * 1000;
+		}
+		mux.unlock();
+		return pts;
+	}
+
+	void Clear()
+	{
+		mux.lock();
+		if (io)
+		{
+			io->reset();	
+		}
+		mux.unlock();
+	}
+
 	virtual void Close()
 	{
 		//要加锁，因为打开和关闭有可能不在一个线程
@@ -44,6 +82,27 @@ public:
 		if(io)	
 			return true;
 		return false;
+	}
+
+	void SetPause(bool isPause)
+	{
+		mux.lock();
+		if (!output)
+		{
+			mux.unlock();
+			return;
+		}
+		if (isPause)
+		{
+			//把output挂起
+			output->suspend();
+		}
+		else
+		{
+			//恢复
+			output->resume();
+		}
+		mux.unlock();
 	}
 
 	//播放音频

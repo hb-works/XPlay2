@@ -21,7 +21,7 @@ void XResample::Close()
 }
 
 //输出参数和输入参数一致除了采样格式，输出为S16
-bool XResample::Open(AVCodecParameters *para)
+bool XResample::Open(AVCodecParameters *para, bool isClearPara)
 {
 	if (!para)
 		return false;
@@ -41,8 +41,9 @@ bool XResample::Open(AVCodecParameters *para)
 		para->sample_rate,
 		0, 0
 	);
-	//用完了就释放掉
-	avcodec_parameters_free(&para);
+	if(isClearPara)
+		//用完了就释放掉
+		avcodec_parameters_free(&para);
 	//swr_init初始化
 	int re = swr_init(actx);
 	mux.unlock();
@@ -75,9 +76,11 @@ int XResample::Resample(AVFrame *indata, unsigned char *d)
 		data, indata->nb_samples,			//输出, 样本数 （可以在这做个判断，以防格式不对）
 		(const uint8_t**)indata->data, indata->nb_samples		//输入, 样本数
 	);
+	int outSize = re * indata->channels * av_get_bytes_per_sample((AVSampleFormat)outFormat);
+	//用完赶紧释放掉 不然会造成内存泄露
+	av_frame_free(&indata);
 	if (re <= 0)
 		return re;
-	int outSize = re * indata->channels * av_get_bytes_per_sample((AVSampleFormat)outFormat);
 	return outSize;
 }
 

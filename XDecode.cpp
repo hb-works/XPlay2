@@ -6,6 +6,20 @@ extern "C"
 }
 using namespace std;
 
+void XFreePacket(AVPacket **pkt)
+{
+	if (!pkt || !(*pkt))
+		return;
+	av_packet_free(pkt);
+}
+
+void XFreeFrame(AVFrame **frame)
+{
+	if (!frame || !(*frame))
+		return;
+	av_frame_free(frame);
+}
+
 //关闭和清理
 void XDecode::Clear()
 {
@@ -25,6 +39,7 @@ void XDecode::Close()
 		avcodec_close(codec);
 		avcodec_free_context(&codec);
 	}
+	pts = 0;
 	mux.unlock();
 }
 
@@ -131,6 +146,7 @@ AVFrame *XDecode::Recv()
 		return NULL;
 	}
 	//cout << "[" << frame->linesize[0] << "] " << flush;
+	pts = frame->pts;
 	//成功了就把接收到的数据返回
 	return frame;
 }

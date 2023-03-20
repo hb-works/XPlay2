@@ -44,16 +44,16 @@ bool XDemux::Open(const char *url)
 		mux.unlock();
 		char buf[1024] = { 0 };
 		av_strerror(re, buf, sizeof(buf) - 1);
-		cout << "open" << url << "failed!:" << buf << endl;
+		cout << "open " << url << " failed!:" << buf << endl;
 		return false;
 	}
-	cout << "open" << url << "success!" << endl;
+	cout << "open " << url << " success!" << endl;
 
 
 	//获取流信息
 	re = avformat_find_stream_info(ic, 0);
 	//获取总时长 毫秒
-	int totalMs = ic->duration / (AV_TIME_BASE / 1000);
+	this->totalMs = ic->duration / (AV_TIME_BASE / 1000);
 	cout << "总时长：" << totalMs << "毫秒" << endl;
 	//打印视频流的详细信息
 	av_dump_format(ic, 0, url, 0);
@@ -108,6 +108,34 @@ bool XDemux::IsAudio(AVPacket *pkt)
 	return true;
 }
 
+//只读视频，音频丢弃，空间释放
+AVPacket *XDemux::ReadVideo()
+{
+	mux.lock();
+	if (!ic)	//容错
+	{
+		mux.unlock();
+		return 0;
+	}
+	mux.unlock();
+	AVPacket *pkt = NULL;
+	//防止阻塞
+	for (int i = 0; i < 20; i++)
+	{
+		pkt = Read();
+		if (!pkt)
+			break;
+		//如果是视频 就break
+		if (pkt->stream_index == videoStream)
+		{
+			break;
+		}
+		//如果是音频 就丢弃掉
+		av_packet_free(&pkt);
+	}
+	return pkt;
+}
+
 //空间需要调用者释放，释放AVPacket对象空间，和数据空间 av_packet_free
 AVPacket *XDemux::Read()
 {
@@ -138,7 +166,7 @@ AVPacket *XDemux::Read()
 	pkt->dts = pkt->dts * (r2d(ic->streams[pkt->stream_index]->time_base) * 1000);
 	
 	mux.unlock(); //释放锁
-	cout << pkt->pts << " " << flush;
+	//cout << pkt->pts << " " << flush;
 	return pkt;
 }
 

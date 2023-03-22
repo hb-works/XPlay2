@@ -18,10 +18,9 @@ public:
 	void Init()
 	{
 		//打开香港卫视
-		char *url = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
+        const char *url = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
 		//本地文件
 		url = "v1080.mp4";
-		url = "v1920.mp4";
 		cout << "demux.Open = " << demux.Open(url) << endl;
 		//cout << "CopyVPara = " << demux.CopyVPara() << endl;
 		//cout << "CopyAPara = " << demux.CopyAPara() << endl;

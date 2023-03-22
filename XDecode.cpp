@@ -146,6 +146,7 @@ AVFrame *XDecode::Recv()
 		return NULL;
 	}
 	//cout << "[" << frame->linesize[0] << "] " << flush;
+	//接收到后记录一下pts
 	pts = frame->pts;
 	//成功了就把接收到的数据返回
 	return frame;

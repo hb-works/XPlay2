@@ -3,7 +3,10 @@
 #include <QDebug>
 #include <QMessageBox>
 #include "XDemuxThread.h"
+//静态方式创建XDemuxThread对象dt
 static XDemuxThread dt;
+
+//构造函数中直接创建对象并Start
 XPlay2::XPlay2(QWidget *parent)
 	: QWidget(parent)
 {
@@ -20,13 +23,13 @@ XPlay2::~XPlay2()
 	dt.Close();
 }
 
-//按住滑动条
+//事件函数：按住滑动条
 void XPlay2::SliderPress()
 {
 	isSliderPress = true;
 }
 
-//松开滑动条 做seek操作
+//事件函数：松开滑动条 做seek操作
 void XPlay2::SliderRelease()
 {
 	isSliderPress = false;
@@ -108,7 +111,7 @@ void XPlay2::OpenFile()
 		QMessageBox::information(0, "error", "open file failed!!!");
 		return;
 	}
-	//打开成功
+	//打开成功，dt.isPause默认为false，状态为播放
 	SetPause(dt.isPause);
 
 	//打开文件

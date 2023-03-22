@@ -9,6 +9,7 @@ bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, in
 		return false;
 	Clear();
 	vmux.lock();
+	//同步时间
 	synpts = 0;
 	//初始化显示窗口XVideoWidget
 	this->call = call;
@@ -17,8 +18,9 @@ bool XVideoThread::Open(AVCodecParameters *para, IVideoCall *call, int width, in
 		call->Init(width, height);
 	}
 	vmux.unlock();
-
+	//进行视频解码操作，默认成功
 	int re = true;
+	//如果失败，re = false
 	if (!decode->Open(para))
 	{
 		re = false;
@@ -50,7 +52,9 @@ void XVideoThread::run()
 			continue;
 		}
 		//音视频同步，视频比音频快，视频就稍微慢点等等音频
-		//采用的同步策略是 视频同步音频
+		//采用的同步策略是 视频去同步音频
+		//设置一个同步时间synpts，同步时间 < 当前视频解码到的时间，视频解码速度比同步时间（在XDemuxThread中设置了vt->synpts = at->pts;）大，
+		//就是说视频跑得比音频要快，就要视频做等待操作
 		if (synpts > 0 && synpts < decode->pts)
 		{
 			vmux.unlock();

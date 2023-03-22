@@ -41,6 +41,7 @@ bool XAudioThread::Open(AVCodecParameters *para, int sampleRate, int channels)
 {
 	if (!para)
 		return false;
+	//每次打开前先清理一遍，确保打开正确
 	Clear();
 	amux.lock();
 	pts = 0;
@@ -49,25 +50,35 @@ bool XAudioThread::Open(AVCodecParameters *para, int sampleRate, int channels)
 	//	decode = new XDecode();
 	
 	bool re = true;
+	//音频重采样
 	if (!res->Open(para, false))
 	{
+		//重采样失败
 		re = false;
 		cout << "XResample open failed!!!" << endl;
 	}
+	//记录采样率和通道数
+	//重采样成功
 	ap->sampleRate = sampleRate;
 	ap->channels = channels;
 	re = true;
+	//打开音频数据
 	if (!ap->Open())
 	{
+		//打开音频数据失败
 		re = false;
 		cout << "XAudioPlay open failed!!!" << endl;
 	}
+	//打开音频数据成功
 	re = true;
+	//解码音频数据
 	if (!decode->Open(para))
 	{
+		//解码音频数据失败
 		re = false;
 		cout << "audio XDecode open failed!!!" << endl;
 	}
+	//重采样+解码+播放音频都成功 == XAudioThread成功，解锁，返回结果
 	amux.unlock();
 	cout << "XAudioThread::Open success:" << re << endl;
 	return re;

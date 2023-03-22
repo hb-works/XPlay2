@@ -151,22 +151,29 @@ void XDemuxThread::run()
 //关闭线程，清理资源
 void XDemuxThread::Close()
 {
+	//设置退出状态
 	isExit = true;
+	//等待线程结束
 	wait();
+	//分别Close vt和at线程
 	if (vt)
 		vt->Close();
 	if (at)
 		at->Close();
 	mux.lock();
+	//释放内存空间
 	delete vt;
 	delete at;
+	//指针设为NULL，防止出现野指针
 	vt = NULL;
 	at = NULL;
 	mux.unlock();
 }
 
+//XDemuxThread三件事：1、打开解封装	2、打开视频线程处理	3、打开音频线程处理
 bool XDemuxThread::Open(const char *url, IVideoCall *call)
 {
+	//打开视频文件
 	if (url == 0 || url[0] == '\0')
 		return false;
 	mux.lock();
@@ -176,7 +183,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
 		vt = new XVideoThread();
 	if (!at)
 		at = new XAudioThread();
-	//打开解封装
+	//1、打开解封装
 	bool re = demux->Open(url);
 	//失败的话
 	if (!re)
@@ -184,13 +191,13 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
 		cout << "demux->Open(url) failed!!!" << endl;
 		return false;
 	}
-	//打开视频解码器和处理线程
+	//2、打开视频解码器和处理线程
 	if (!vt->Open(demux->CopyVPara(), call, demux->width, demux->height))
 	{
 		re = false;
 		cout << "vt->Open failed!!!" << endl;
 	}
-	//打开音频解码器和处理线程
+	//3、打开音频解码器和处理线程
 	if (!at->Open(demux->CopyAPara(),demux->sampleRate, demux->channels))
 	{
 		re = false;
@@ -205,6 +212,7 @@ bool XDemuxThread::Open(const char *url, IVideoCall *call)
 
 void XDemuxThread::Start()
 {
+	//启动解码器和音视频线程
 	mux.lock();
 	if (!demux)
 		demux = new XDemux();

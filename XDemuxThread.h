@@ -30,7 +30,7 @@ public:
 	long long pts = 0;
 	long long totalMs = 0;
 	void SetPause(bool isPause);
-	//设置一个是否暂停的状态
+	//设置一个是否暂停的状态，默认是false，即播放状态 选择文件后初始化为播放状态
 	bool isPause = false;
 protected:
 	std::mutex mux;
@@ -38,4 +38,3 @@ protected:
 	XVideoThread *vt = 0;
 	XAudioThread *at = 0;
 };
-

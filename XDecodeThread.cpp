@@ -66,6 +66,7 @@ void XDecodeThread::Push(AVPacket *pkt)
 		msleep(1);
 	}
 }
+
 XDecodeThread::XDecodeThread()
 {
 	//´ò¿ª½âÂëÆ÷

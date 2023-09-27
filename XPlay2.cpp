@@ -38,7 +38,7 @@ void XPlay2::SliderRelease()
 	dt.Seek(pos);
 }
 
-//定时器 滑动条显示
+//定时器 滑动条显示 可以不用考虑线程安全，因为这个部分偶尔错了问题不大
 void XPlay2::timerEvent(QTimerEvent *e)
 {
 	//如果滑动条被按住 就直接return，不要再持续刷新到播放位置了
@@ -47,7 +47,7 @@ void XPlay2::timerEvent(QTimerEvent *e)
 	long long total = dt.totalMs;
 	if (total > 0)
 	{
-		//得到位置所在
+		//得到所在的百分比位置
 		double pos = (double)dt.pts / (double)total;
 		//把原视频分成了1000份（maximum==999），*相应的倍数就可以得到播放的位置
 		int v = ui.playPos->maximum() * pos;
@@ -80,7 +80,7 @@ void XPlay2::resizeEvent(QResizeEvent *e)
 //播放or暂停
 void XPlay2::PlayOrPause()
 {
-	//暂停后还会继续播放一小段缓冲队列中的内容，缓冲队列没问题。
+	//暂停后还会继续播放一小段缓冲队列中的内容，用缓冲队列没问题，但要注意暂停后要把视频显示和音频播放也停了。
 	//暂停在解码和音频播放也要做到暂停
 	bool isPause = !dt.isPause;
 	SetPause(isPause);

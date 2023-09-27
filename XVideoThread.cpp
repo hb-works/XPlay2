@@ -44,7 +44,7 @@ void XVideoThread::run()
 	while (!isExit)
 	{
 		vmux.lock();
-		//如果是暂停状态 就sleep
+		//如果是暂停状态 就sleep，不要播放缓冲队列中的内容了
 		if (this->isPause)
 		{
 			vmux.unlock();

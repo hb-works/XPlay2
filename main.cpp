@@ -17,7 +17,7 @@ public:
 	XVideoThread vt;
 	void Init()
 	{
-		//打开香港卫视
+		//打开香港卫视（此链接已经无法打开了）
         const char *url = "rtmp://live.hkstv.hk.lxdns.com/live/hks";
 		//本地文件
 		url = "v1080.mp4";

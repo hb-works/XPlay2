@@ -94,7 +94,7 @@ public:
 		}
 		if (isPause)
 		{
-			//把output挂起
+			//把output挂起，不要播放缓冲队列中的内容了
 			output->suspend();
 		}
 		else

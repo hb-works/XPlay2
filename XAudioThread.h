@@ -29,7 +29,5 @@ protected:
 	std::mutex amux;
 	XAudioPlay *ap = 0;
 	XResample *res = 0;
-	
-
 };
 
